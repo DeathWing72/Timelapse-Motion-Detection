@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 public class TimelapseMotionDetection
 {
-    private static final double THRESHOLD = 1.0;
+    private static final double THRESHOLD = .9;
     static FileOutput fOut = new FileOutput();
     public static void main(String[] args)
     {
@@ -33,7 +33,7 @@ public class TimelapseMotionDetection
         int goodMatch = 0;
         int badMatch = 0;
         System.out.println("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Good/Bad Match");
-        fOut.newPrint("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Good/Bad Match");
+        fOut.newPrintln("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Good/Bad Match");
         for(int i=0;i<images.length-1;i++)
         {
             SsimCalculator ssim;
@@ -62,17 +62,20 @@ public class TimelapseMotionDetection
                 {
                     // printMatch(images[i],images[i+1],simIndex);
                     System.out.println(",good match");
+                    fOut.newPrintln(",good match");
                     goodMatch++;
                 }
                 else
                 {
                     System.out.println(",bad match");
+                    fOut.newPrintln(",bad match");
                     badMatch++;
                 }
             }
         }
         double matchPercent = (double)((goodMatch/(goodMatch+badMatch))*100);
         System.out.println("Good match percentage: "+matchPercent+"%");
+        fOut.newPrintln("Good match percentage: "+matchPercent+"%");
     }
     public static String fileDate(File file)
     {
