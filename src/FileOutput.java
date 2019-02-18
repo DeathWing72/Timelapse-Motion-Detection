@@ -13,7 +13,11 @@ public class FileOutput
     }
     public void newPrint(String print)
     {
-        out.println(print);
+        out.print(print);
+    }
+    public void newPrintln(String print)
+    {
+    	out.println(print);
     }
     public void endPrint()
     {

@@ -14,10 +14,14 @@ public class FileFrame extends JFrame
     {
         fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        //int returnVal = fc.showOpenDialog(FileFrame.this);
-        if(/*returnVal*/fc.showOpenDialog(FileFrame.this) == JFileChooser.APPROVE_OPTION)
+        int returnVal = fc.showOpenDialog(FileFrame.this);
+        if(returnVal == JFileChooser.APPROVE_OPTION)
         {
             file = fc.getSelectedFile();
+        }
+        else if(returnVal == JFileChooser.CANCEL_OPTION)
+        {
+        	System.exit(0);
         }
     }
     public static void main() {
