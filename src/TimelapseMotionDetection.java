@@ -11,13 +11,14 @@ public class TimelapseMotionDetection
         FileFrame frame = new FileFrame();
         File subDir = new File(frame.file.getAbsoluteFile(), "Analysis Results");
         subDir.mkdir();
-        fOut.setFiles(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Match Results", ".csv");
-        fLog.setFiles(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Data Log", ".txt");
+        fOut.setFile(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Match Results", ".csv");
+        fLog.setFile(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Data Log", ".txt");
         File[] files = getFile(frame.file);
         PotMatches[] pm = findMatches(files);
         confirmMatches(pm);
         fOut.endPrint();
         fLog.endPrint();
+        System.exit(0);
     }
     public static File[] getFile(File dir)
     {
@@ -63,7 +64,7 @@ public class TimelapseMotionDetection
     	for(int i=0;i < files.length;i++)
     	{
     		CompareFrame frame = new CompareFrame(files[i].f1,files[i].f2,files[i].simIndex,fileDate(files[i].f1),fileTime(files[i].f1),fileTime(files[i].f2),i+1,files.length);
-            while(!frame.buttonPressed)
+    		while(!frame.buttonPressed)
             {
                 try
                 {
