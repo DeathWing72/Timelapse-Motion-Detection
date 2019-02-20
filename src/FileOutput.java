@@ -5,7 +5,7 @@ import java.io.IOException;
 public class FileOutput
 {
     private PrintWriter out;
-    public void setFiles(File file, String customLoc, String name, String ext)
+    public void setFile(File file, String customLoc, String name, String ext)
     {
     	if(customLoc.length() != 0)
     	{

@@ -25,7 +25,7 @@ public class FileFrame extends JFrame
         }
     }
     public static void main() {
-        // Run the GUI construction in the Event-Dispatching thread for thread-safety
+    	// Run the GUI construction in the Event-Dispatching thread for thread-safety
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
