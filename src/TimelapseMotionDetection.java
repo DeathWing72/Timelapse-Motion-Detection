@@ -9,12 +9,14 @@ public class TimelapseMotionDetection
     public static void main(String[] args)
     {
         FileFrame frame = new FileFrame();
+        ProgressFrame pg = new ProgressFrame();
         File subDir = new File(frame.file.getAbsoluteFile(), "Analysis Results");
         subDir.mkdir();
         fOut.setFile(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Match Results", ".csv");
         fLog.setFile(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Data Log", ".txt");
         File[] files = getFile(frame.file);
         PotMatches[] pm = findMatches(files);
+        pg.endProgress();
         confirmMatches(pm);
         fOut.endPrint();
         fLog.endPrint();
