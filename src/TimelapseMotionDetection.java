@@ -1,21 +1,28 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 public class TimelapseMotionDetection
 {
-    private static final double THRESHOLD = .9;
-    static FileOutput fOut = new FileOutput();
+    private static final double THRESHOLD = .88;
+    static FileOutput fOut = new FileOutput(), fLog = new FileOutput();
     public static void main(String[] args)
     {
         FileFrame frame = new FileFrame();
-        fOut.setFile(frame.file);
+        File subDir = new File(frame.file.getAbsoluteFile(), "Analysis Results");
+        subDir.mkdir();
+        fOut.setFiles(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Match Results", ".csv");
+        fLog.setFiles(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Data Log", ".txt");
         File[] files = getFile(frame.file);
-        findMatchesGUI(files);
+        PotMatches[] pm = findMatches(files);
+        confirmMatches(pm);
         fOut.endPrint();
+        fLog.endPrint();
     }
     public static File[] getFile(File dir)
     {
-        System.err.println(dir.getAbsoluteFile()); //Print folder path to err dialog
+        System.err.println(timeStamp() + dir.getAbsoluteFile()); //Print folder path to err dialog
+        fLog.newPrintln(timeStamp() + dir.getAbsolutePath());
         File[] dirContents = dir.listFiles(); //Initialize File array
         ArrayList<File> files = new ArrayList<File>();
         for(int fn = 0; fn < dirContents.length; fn++)
@@ -28,12 +35,9 @@ public class TimelapseMotionDetection
         }
         return files.toArray(new File[files.size()]);
     }
-    public static void findMatchesGUI(File[] images)
+    public static PotMatches[] findMatches(File[] images)
     {
-        int goodMatch = 0;
-        int badMatch = 0;
-        System.out.println("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Good/Bad Match");
-        fOut.newPrintln("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Good/Bad Match");
+    	ArrayList<PotMatches> matches = new ArrayList<PotMatches>();
         for(int i=0;i<images.length-1;i++)
         {
             SsimCalculator ssim;
@@ -45,37 +49,48 @@ public class TimelapseMotionDetection
             } catch(SsimException | IOException e) {}
             if(simIndex <= THRESHOLD)
             {
-                CompareFrame frame = new CompareFrame(images[i],images[i+1],simIndex,fileDate(images[i]),fileTime(images[i]),fileTime(images[i+1]),i+1,images.length-1);
-                while(!frame.buttonPressed)
-                {
-                    try
-                    {
-                        Thread.sleep(1);
-                    }
-                    catch(InterruptedException ex)
-                    {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-                printMatch(images[i],images[i+1],simIndex);
-                if(frame.isMatch)
-                {
-                    // printMatch(images[i],images[i+1],simIndex);
-                    System.out.println(",good match");
-                    fOut.newPrintln(",good match");
-                    goodMatch++;
-                }
-                else
-                {
-                    System.out.println(",bad match");
-                    fOut.newPrintln(",bad match");
-                    badMatch++;
-                }
+                matches.add(new PotMatches(images[i],images[i+1],simIndex));
+                System.err.println(timeStamp() + "New Potential Match - " + simIndex);
+                fLog.newPrintln(timeStamp() + "New Potential Match - " + String.valueOf(simIndex));
             }
         }
-        double matchPercent = (double)((goodMatch/(goodMatch+badMatch))*100);
-        System.out.println("Good match percentage: "+matchPercent+"%");
-        fOut.newPrintln("Good match percentage: "+matchPercent+"%");
+        return matches.toArray(new PotMatches[matches.size()]);
+    }
+    public static void confirmMatches(PotMatches[] files)
+    {
+    	System.out.println("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Match? (No-0/Yes-1)");
+        fOut.newPrintln("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Match? (No-0/Yes-1)");
+    	for(int i=0;i < files.length;i++)
+    	{
+    		CompareFrame frame = new CompareFrame(files[i].f1,files[i].f2,files[i].simIndex,fileDate(files[i].f1),fileTime(files[i].f1),fileTime(files[i].f2),i+1,files.length);
+            while(!frame.buttonPressed)
+            {
+                try
+                {
+                    Thread.sleep(1);
+                }
+                catch(InterruptedException ex)
+                {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            printMatch(files[i].f1,files[i].f2,files[i].simIndex);
+            if(frame.isMatch)
+            {
+                // printMatch(images[i],images[i+1],simIndex);
+                System.out.println(",1");
+                fOut.newPrintln(",1");
+            }
+            else
+            {
+                System.out.println(",0");
+                fOut.newPrintln(",0");
+            }
+    	}
+    	System.out.println(",,,,,Match Percentage:,=SUM(G2:G"+(files.length+1)+")/"+files.length);
+    	fOut.newPrintln(",,,,,Match Percentage:,=SUM(G2:G"+(files.length+1)+")/"+files.length);
+    	System.err.println(timeStamp() + "Analysis Finished");
+    	fLog.newPrintln(timeStamp() + "Analysis Finished");
     }
     public static String fileDate(File file)
     {
@@ -92,5 +107,22 @@ public class TimelapseMotionDetection
         System.out.print(a.getName()+","+b.getName()+","+c+","+fileDate(a)+","+fileTime(a)+","+fileTime(b));
         fOut.newPrint(a.getName()+","+b.getName()+","+c+","+fileDate(a)+","+fileTime(a)+","+fileTime(b));
         //System.out.println("=HYPERLINK("+a.getPath()+"),  ,=HYPERLINK("+b.getPath()+")");
+    }
+    public static String timeStamp()
+    {
+    	Calendar c = Calendar.getInstance();
+    	java.text.SimpleDateFormat timeStamp = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+    	return timeStamp.format(c.getTime()) + " --> ";
+    }
+    public static class PotMatches
+    {
+    	public File f1,f2;
+    	public double simIndex;
+    	public PotMatches(File f1,File f2,double simIndex)
+    	{
+    		this.f1 = f1;
+    		this.f2 = f2;
+    		this.simIndex = simIndex;
+    	}
     }
 }
