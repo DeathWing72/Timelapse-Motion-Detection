@@ -5,7 +5,7 @@ import java.io.File;
 @SuppressWarnings("serial")
 public class CompareFrame extends JFrame
 {
-    private boolean isMatch, buttonPressed;
+    private boolean isMatch, buttonPressed, endEarly;
     private Container cp;
     private JPanel topPane, cenPane;
     public CompareFrame()
@@ -26,11 +26,13 @@ public class CompareFrame extends JFrame
         
         JPanel botPane = new JPanel();
         botPane.setPreferredSize(new Dimension(1440,45));
-        botPane.setLayout(new GridLayout(1,2));
+        botPane.setLayout(new GridLayout(1,/*3*/2));
         cp.add(botPane,BorderLayout.PAGE_END);
         
         JButton matchButton = new JButton("Confirm Movement");
         botPane.add(matchButton);
+        /*JButton endEarlyButton = new JButton("End User Confirmation Early");
+        botPane.add(endEarlyButton);*/
         JButton noMatchButton = new JButton("No Movement");
         botPane.add(noMatchButton);
         
@@ -47,6 +49,29 @@ public class CompareFrame extends JFrame
             buttonPressed = true;
          }
         });
+        /*endEarlyButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent evt) {
+           EndEarlyConfirmFrame end = new EndEarlyConfirmFrame();
+           while(!end.getButtonPressed())
+           {
+        	   try
+               {
+                   Thread.sleep(1);
+               }
+               catch(InterruptedException ex)
+               {
+                   Thread.currentThread().interrupt();
+               }
+           }
+           if(end.getIsEnd())
+    	   {
+    		   endEarly = true;
+    		   buttonPressed = true;
+    	   }
+           end.killFrame();
+         }
+        });*/
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // Exit program if close-window button clicked
         setTitle("Image Comparison"); // "super" JFrame sets title
@@ -99,9 +124,14 @@ public class CompareFrame extends JFrame
     {
     	return buttonPressed;
     }
+    public boolean getEndEarly()
+    {
+    	return endEarly;
+    }
     public void resetStates()
     {
     	buttonPressed = false;
     	isMatch = false;
+    	endEarly = false;
     }
 }
