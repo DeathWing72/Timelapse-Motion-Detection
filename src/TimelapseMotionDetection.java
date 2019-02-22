@@ -8,6 +8,7 @@ public class TimelapseMotionDetection
     static FileOutput fOut = new FileOutput(), fLog = new FileOutput();
     public static void main(String[] args)
     {
+    	fileOpenWarning();
         FileFrame frame = new FileFrame();
         ProgressFrame pg = new ProgressFrame();
         File subDir = new File(frame.file.getAbsoluteFile(), "Analysis Results");
@@ -21,6 +22,21 @@ public class TimelapseMotionDetection
         fOut.endPrint();
         fLog.endPrint();
         System.exit(0);
+    }
+    public static void fileOpenWarning()
+    {
+    	FileOpenWarningFrame frame = new FileOpenWarningFrame();
+    	while(!frame.getButtonPressed())
+        {
+            try
+            {
+                Thread.sleep(1);
+            }
+            catch(InterruptedException ex)
+            {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
     public static File[] getFile(File dir)
     {
@@ -78,6 +94,12 @@ public class TimelapseMotionDetection
                     Thread.currentThread().interrupt();
                 }
             }
+    		if(frame.getEndEarly())
+    		{
+    			System.err.println(timeStamp()+"User Confirmation Ended Early");
+    			fLog.newPrintln(timeStamp()+"User Confirmation Ended Early");
+    			break;
+    		}
             printMatch(files[i].f1,files[i].f2,files[i].simIndex);
             if(frame.getIsMatch())
             {
