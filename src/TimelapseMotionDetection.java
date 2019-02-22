@@ -63,10 +63,11 @@ public class TimelapseMotionDetection
     {
     	System.out.println("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Match? (No-0/Yes-1)");
         fOut.newPrintln("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Match? (No-0/Yes-1)");
-    	for(int i=0;i < files.length;i++)
+    	CompareFrame frame = new CompareFrame();
+        for(int i=0;i < files.length;i++)
     	{
-    		CompareFrame frame = new CompareFrame(files[i].f1,files[i].f2,files[i].simIndex,fileDate(files[i].f1),fileTime(files[i].f1),fileTime(files[i].f2),i+1,files.length);
-    		while(!frame.buttonPressed)
+    		frame.updateFrame(files[i].f1,files[i].f2,files[i].simIndex,fileDate(files[i].f1),fileDate(files[i].f2),fileTime(files[i].f1),fileTime(files[i].f2),i+1,files.length);
+    		while(!frame.getButtonPressed())
             {
                 try
                 {
@@ -78,7 +79,7 @@ public class TimelapseMotionDetection
                 }
             }
             printMatch(files[i].f1,files[i].f2,files[i].simIndex);
-            if(frame.isMatch)
+            if(frame.getIsMatch())
             {
                 // printMatch(images[i],images[i+1],simIndex);
                 System.out.println(",1");
@@ -89,7 +90,9 @@ public class TimelapseMotionDetection
                 System.out.println(",0");
                 fOut.newPrintln(",0");
             }
+            frame.resetStates();
     	}
+        frame.killFrame();
     	System.out.println(",,,,,Match Percentage:,=SUM(G2:G"+(files.length+1)+")/"+files.length);
     	fOut.newPrintln(",,,,,Match Percentage:,=SUM(G2:G"+(files.length+1)+")/"+files.length);
     	System.err.println(timeStamp() + "Analysis Finished");
