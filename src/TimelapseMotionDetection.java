@@ -2,30 +2,87 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import javax.swing.JOptionPane;
 public class TimelapseMotionDetection
 {
-    private static final double THRESHOLD = .88;
-    static FileOutput fOut = new FileOutput(), fLog = new FileOutput();
+    private static double threshold = .91;
+    private static FileOutput fOut = new FileOutput(), fLog = new FileOutput();
+    private static ProgressFrame pg;
     public static void main(String[] args)
     {
+    	fileStart();
     	fileOpenWarning();
         FileFrame frame = new FileFrame();
-        ProgressFrame pg = new ProgressFrame();
+        pg = new ProgressFrame(0,1);
         File subDir = new File(frame.file.getAbsoluteFile(), "Analysis Results");
         subDir.mkdir();
-        fOut.setFile(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Match Results", ".csv");
-        fLog.setFile(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Analysis Data Log", ".txt");
+        fOut.setFile(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Folder Image Analysis Match Results", ".csv");
+        fLog.setFile(frame.file, subDir.getAbsolutePath(), frame.file.getName()+" Folder Image Analysis Data Log", ".txt");
         File[] files = getFile(frame.file);
         PotMatches[] pm = findMatches(files);
         pg.endProgress();
-        confirmMatches(pm);
+        double matchPer = confirmMatches(pm);
+        System.err.println(timeStamp() + "Confirmed Match Percentage: "+(matchPer*100)+"%");
+		fLog.newPrintln(timeStamp() + "Confirmed Match Percentage: "+(matchPer*100)+"%");
+		endWarning(subDir);
         fOut.endPrint();
         fLog.endPrint();
         System.exit(0);
     }
+    public static void fileStart()
+    {
+    	StartFrame frame = new StartFrame(threshold);
+    	while(!frame.getStartButtonPressed() && !frame.getChangeButtonPressed())
+        {
+            try
+            {
+                Thread.sleep(1);
+            }
+            catch(InterruptedException ex)
+            {
+                Thread.currentThread().interrupt();
+            }
+        }
+    	if(frame.getChangeButtonPressed())
+    	{
+    		thresholdDialog();
+    		fileStart();
+    	}
+    }
+    public static void thresholdDialog()
+    {
+    	String newThresh = JOptionPane.showInputDialog("Please input a new match\nthreshold between 0.0 and 1.0");
+		double tmpThresh = Double.parseDouble(newThresh);
+		if(tmpThresh >= 0.0 && tmpThresh <= 1.0)
+		{
+			threshold = tmpThresh;
+		}
+		else
+		{
+			thresholdDialog();
+		}
+    }
     public static void fileOpenWarning()
     {
     	FileOpenWarningFrame frame = new FileOpenWarningFrame();
+    	System.err.println(timeStamp() + "File Open Warning Frame Opened");
+    	while(!frame.getButtonPressed())
+        {
+            try
+            {
+                Thread.sleep(1);
+            }
+            catch(InterruptedException ex)
+            {
+                Thread.currentThread().interrupt();
+            }
+        }
+    	System.err.println(timeStamp() + "File Open Warning Heeded by User");
+    }
+    public static void endWarning(File file)
+    {
+    	EndFrame frame = new EndFrame(file);
     	while(!frame.getButtonPressed())
         {
             try
@@ -56,17 +113,21 @@ public class TimelapseMotionDetection
     }
     public static PotMatches[] findMatches(File[] images)
     {
+    	pg.pbSetMax(images.length-1);
     	ArrayList<PotMatches> matches = new ArrayList<PotMatches>();
         for(int i=0;i<images.length-1;i++)
         {
-            SsimCalculator ssim;
+            pg.pbUpdate(i+1);
+            System.err.println(timeStamp() + "Comparing " + images[i].getName() + " and " + images[i].getName());
+        	fLog.newPrintln(timeStamp() + "Comparing " + images[i].getName() + " and " + images[i].getName());
+        	SsimCalculator ssim;
             double simIndex = 0;
             try
             {
                 ssim = new SsimCalculator(images[i]);
                 simIndex = ssim.compareTo(images[i+1]);
             } catch(SsimException | IOException e) {}
-            if(simIndex <= THRESHOLD)
+            if(simIndex <= threshold)
             {
                 matches.add(new PotMatches(images[i],images[i+1],simIndex));
                 System.err.println(timeStamp() + "New Potential Match - " + simIndex);
@@ -75,11 +136,13 @@ public class TimelapseMotionDetection
         }
         return matches.toArray(new PotMatches[matches.size()]);
     }
-    public static void confirmMatches(PotMatches[] files)
+    public static double confirmMatches(PotMatches[] files)
     {
-    	System.out.println("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Match? (No-0/Yes-1)");
-        fOut.newPrintln("File Name a,File Name b,Similarity Index,Date,Start Time,End Time,Match? (No-0/Yes-1)");
+    	System.out.println("File Name a,File Name b,Similarity Index,Date,Start Time,End Time");
+        fOut.newPrintln("File Name a,File Name b,Similarity Index,Date,Start Time,End Time");
     	CompareFrame frame = new CompareFrame();
+    	int matches = 0;
+    	int comparisons = 0;
         for(int i=0;i < files.length;i++)
     	{
     		frame.updateFrame(files[i].f1,files[i].f2,files[i].simIndex,fileDate(files[i].f1),fileDate(files[i].f2),fileTime(files[i].f1),fileTime(files[i].f2),i+1,files.length);
@@ -96,29 +159,29 @@ public class TimelapseMotionDetection
             }
     		if(frame.getEndEarly())
     		{
-    			System.err.println(timeStamp()+"User Confirmation Ended Early");
-    			fLog.newPrintln(timeStamp()+"User Confirmation Ended Early");
+    			System.err.println(timeStamp() + "User Confirmation Ended Early");
+    			fLog.newPrintln(timeStamp() + "User Confirmation Ended Early");
     			break;
     		}
-            printMatch(files[i].f1,files[i].f2,files[i].simIndex);
             if(frame.getIsMatch())
             {
-                // printMatch(images[i],images[i+1],simIndex);
-                System.out.println(",1");
-                fOut.newPrintln(",1");
+                printMatch(files[i].f1,files[i].f2,files[i].simIndex);
+            	matches++;
+                System.err.println(timeStamp() + "Potential Match Confirmed by User");
+    			fLog.newPrintln(timeStamp() + "Potential Match Confirmed by User");
             }
             else
             {
-                System.out.println(",0");
-                fOut.newPrintln(",0");
+                System.err.println(timeStamp() + "Potential Match Denied by User");
+    			fLog.newPrintln(timeStamp() + "Potential Match Denied by User");
             }
             frame.resetStates();
+            comparisons++;
     	}
         frame.killFrame();
-    	System.out.println(",,,,,Match Percentage:,=SUM(G2:G"+(files.length+1)+")/"+files.length);
-    	fOut.newPrintln(",,,,,Match Percentage:,=SUM(G2:G"+(files.length+1)+")/"+files.length);
     	System.err.println(timeStamp() + "Analysis Finished");
     	fLog.newPrintln(timeStamp() + "Analysis Finished");
+    	return (double)matches/comparisons;
     }
     public static String fileDate(File file)
     {
@@ -132,9 +195,14 @@ public class TimelapseMotionDetection
     }
     public static void printMatch(File a, File b, double c)
     {
-        System.out.print(a.getName()+","+b.getName()+","+c+","+fileDate(a)+","+fileTime(a)+","+fileTime(b));
-        fOut.newPrint(a.getName()+","+b.getName()+","+c+","+fileDate(a)+","+fileTime(a)+","+fileTime(b));
-        //System.out.println("=HYPERLINK("+a.getPath()+"),  ,=HYPERLINK("+b.getPath()+")");
+        System.out.println(a.getName()+","+b.getName()+","+c+","+fileDate(a)+","+fileTime(a)+","+fileTime(b));
+        fOut.newPrintln(a.getName()+","+b.getName()+","+c+","+fileDate(a)+","+fileTime(a)+","+fileTime(b));
+        System.err.println(a.getName()+","+b.getName()+","+c+","+fileDate(a)+","+fileTime(a)+","+fileTime(b));
+        fLog.newPrintln(a.getName()+","+b.getName()+","+c+","+fileDate(a)+","+fileTime(a)+","+fileTime(b));
+    }
+    public static void setThreshold(double t)
+    {
+    	threshold = t;
     }
     public static String timeStamp()
     {
@@ -144,8 +212,8 @@ public class TimelapseMotionDetection
     }
     public static class PotMatches
     {
-    	public File f1,f2;
-    	public double simIndex;
+    	protected File f1,f2;
+    	protected double simIndex;
     	public PotMatches(File f1,File f2,double simIndex)
     	{
     		this.f1 = f1;

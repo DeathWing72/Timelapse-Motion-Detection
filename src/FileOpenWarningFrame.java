@@ -9,11 +9,12 @@ public class FileOpenWarningFrame extends JFrame
 	public FileOpenWarningFrame()
 	{
 		Container cp = getContentPane();
-		cp.setLayout(new GridLayout(2,1));
-		JLabel warnLabel = new JLabel("Please close any open file within the target folder before proceeding.",SwingConstants.CENTER);
-        cp.add(warnLabel);
+		cp.setLayout(new BorderLayout());
+		JLabel warnLabel = new JLabel("Please close any open file associated with the target folder before proceeding.",SwingConstants.CENTER);
+        warnLabel.setPreferredSize(new Dimension(500,100));
+		cp.add(warnLabel,BorderLayout.NORTH);
         JButton okButton = new JButton("Confirm Files Closed");
-        cp.add(okButton);
+        cp.add(okButton,BorderLayout.CENTER);
         okButton.addActionListener(new ActionListener() {
 		 @Override
          public void actionPerformed(ActionEvent evt) {
@@ -24,7 +25,7 @@ public class FileOpenWarningFrame extends JFrame
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // Exit program if close-window button clicked
         setTitle("Timelapse Motion Detection"); // "super" JFrame sets title
-        setSize(600, 400);        // "super" JFrame sets initial size
+        setSize(500, 300);        // "super" JFrame sets initial size
         setVisible(true);          // "super" JFrame shows
 	}
 	public static void main()
