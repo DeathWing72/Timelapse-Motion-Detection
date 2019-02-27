@@ -13,8 +13,6 @@ public class ProgressFrame extends JFrame
 		cp.add(topPane);
 		JLabel progLabel1 = new JLabel("Image Processing in Progress.  Please Wait...",SwingConstants.CENTER);
         topPane.add(progLabel1);
-//        JLabel progLabel2 = new JLabel("Please Wait...",SwingConstants.CENTER);
-//        topPane.add(progLabel2);
         pb = new JProgressBar(min,max);
         pb.setStringPainted(true);
         topPane.add(pb);

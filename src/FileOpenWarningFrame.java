@@ -10,8 +10,8 @@ public class FileOpenWarningFrame extends JFrame
 	{
 		Container cp = getContentPane();
 		cp.setLayout(new BorderLayout());
-		JLabel warnLabel = new JLabel("Please close any open file associated with the target folder before proceeding.",SwingConstants.CENTER);
-        warnLabel.setPreferredSize(new Dimension(500,100));
+		JLabel warnLabel = new JLabel("Please close any open file associated with the target folder before proceeding. NOTE: Please strictly use .bmp image files originating from SkyStudio Pro for full program functionality.",SwingConstants.CENTER);
+        warnLabel.setPreferredSize(new Dimension(1100,100));
 		cp.add(warnLabel,BorderLayout.NORTH);
         JButton okButton = new JButton("Confirm Files Closed");
         cp.add(okButton,BorderLayout.CENTER);
@@ -25,7 +25,7 @@ public class FileOpenWarningFrame extends JFrame
         });
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // Exit program if close-window button clicked
         setTitle("Timelapse Motion Detection"); // "super" JFrame sets title
-        setSize(500, 300);        // "super" JFrame sets initial size
+        setSize(1100, 300);        // "super" JFrame sets initial size
         setVisible(true);          // "super" JFrame shows
 	}
 	public static void main()
