@@ -1,12 +1,27 @@
+/*
+ * Copyright (c) 2019, Joseph Tyler Jones. All rights reserved.
+ */
 import java.io.File;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+/**
+ * JFrame which displays the data output file directory path, has link to said path, and ends program
+ * @author Tyler Jones
+ * @version 1.0
+ */
 @SuppressWarnings("serial")
 public class EndFrame extends JFrame
 {
+	/**
+	 * Has a button been pressed?
+	 */
 	private boolean buttonPressed;
+	/**
+	 * Constructs a new EndFrame
+	 * @param file file output data file directory
+	 */
 	public EndFrame(File file)
 	{
 		Container cp = getContentPane();
@@ -41,6 +56,10 @@ public class EndFrame extends JFrame
         setSize(900, 120);        // "super" JFrame sets initial size
         setVisible(true);          // "super" JFrame shows
 	}
+	/**
+	 * Runs constructor
+	 * @param file file output data file directory
+	 */
 	public static void main(File file)
 	{
 	    // Run the GUI construction in the Event-Dispatching thread for thread-safety
@@ -51,6 +70,11 @@ public class EndFrame extends JFrame
 	        }
 	    });
 	}
+	/**
+	 * Open file output data file directory
+	 * @param file file output data file directory
+	 * @return idk man
+	 */
 	public static boolean open(File file)
 	{
 	    try
@@ -85,6 +109,10 @@ public class EndFrame extends JFrame
 	        return false;
 	    }
 	}
+	/**
+	 * Get buttonPressed
+	 * @return buttonPressed boolean
+	 */
 	public boolean getButtonPressed()
 	{
 		return buttonPressed;

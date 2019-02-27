@@ -1,15 +1,28 @@
-import java.awt.*;
-import java.awt.event.*;
+/*
+ * Copyright (c) 2019, Joseph Tyler Jones. All rights reserved.
+ */
 import javax.swing.*;
-import javax.swing.filechooser.*;
 import javax.swing.SwingUtilities;
 import java.io.File;
-@SuppressWarnings({ "unused", "serial" })
+/**
+ * JFrame which contains a file explorer for selecting a file directory
+ * @author Tyler Jones
+ * @version 1.0
+ */
+@SuppressWarnings("serial")
 public class FileFrame extends JFrame
 {
-    static private final String newline = "\n";
-    JFileChooser fc;
-    File file;
+	/**
+	 * JFileChooser object
+	 */
+    private JFileChooser fc;
+    /**
+     * user chosen target file directory File object
+     */
+    private File file;
+    /**
+     * FileFrame constructor
+     */
     public FileFrame()
     {
         fc = new JFileChooser();
@@ -24,6 +37,9 @@ public class FileFrame extends JFrame
         	System.exit(0);
         }
     }
+    /**
+     * Runs constructor
+     */
     public static void main() {
     	// Run the GUI construction in the Event-Dispatching thread for thread-safety
         SwingUtilities.invokeLater(new Runnable() {
@@ -32,5 +48,13 @@ public class FileFrame extends JFrame
                 new FileFrame(); // Let the constructor do the job
             }
         });
+    }
+    /**
+     * Get file
+     * @return file File object
+     */
+    public File getFile()
+    {
+    	return file;
     }
 }
