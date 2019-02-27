@@ -1,11 +1,25 @@
+/*
+ * Copyright (c) 2019, Joseph Tyler Jones. All rights reserved.
+ */
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+/**
+ * JFrame which warns the user of opened files associated with the target folder before starting comparison
+ * @author Tyler Jones
+ * @version 1.0
+ */
 @SuppressWarnings("serial")
 public class FileOpenWarningFrame extends JFrame
 {
+	/**
+	 * Has a button been pressed?
+	 */
 	private boolean buttonPressed;
+	/**
+	 * Constructs FileOpenWarningFrame
+	 */
 	public FileOpenWarningFrame()
 	{
 		Container cp = getContentPane();
@@ -28,6 +42,9 @@ public class FileOpenWarningFrame extends JFrame
         setSize(1100, 300);        // "super" JFrame sets initial size
         setVisible(true);          // "super" JFrame shows
 	}
+	/**
+	 * Runs constructor
+	 */
 	public static void main()
 	{
 	    // Run the GUI construction in the Event-Dispatching thread for thread-safety
@@ -38,6 +55,10 @@ public class FileOpenWarningFrame extends JFrame
 	        }
 	    });
 	}
+	/**
+	 * Get buttonPressed
+	 * @return buttonPressed boolean
+	 */
 	public boolean getButtonPressed()
 	{
 		return buttonPressed;

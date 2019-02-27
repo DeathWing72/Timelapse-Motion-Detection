@@ -1,16 +1,51 @@
+/*
+ * Copyright (c) 2019, Joseph Tyler Jones. All rights reserved. 
+ */
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.io.File;
+/**
+ * JFrame which displays pair of images and asks for user match confirmation
+ * @author Tyler Jones
+ * @version 1.0
+ */
 @SuppressWarnings("serial")
 public class CompareFrame extends JFrame
 {
-    private boolean isMatch, buttonPressed, endEarly;
+	/**
+	 * Is there a match?
+	 */
+    private boolean isMatch;
+    /**
+     * Has a button been pressed?
+     */
+    private boolean buttonPressed;
+    /**
+     * End the program early?
+     */
+    private boolean endEarly;
+    /**
+     * Content Pane Container
+     */
     private Container cp;
-    private JPanel topPane, cenPane, botPane;
+    /**
+     * Top JPanel
+     */
+    private JPanel topPane;
+    /**
+     * Middle JPanel
+     */
+    private JPanel cenPane;
+    /**
+     * Bottom JPanel
+     */
+    private JPanel botPane;
+    /**
+     * Constructs new CompareFrame
+     */
     public CompareFrame()
     {
-//        this.setExtendedState(Frame.MAXIMIZED_BOTH);
     	cp = getContentPane();
         cp.setLayout(new BorderLayout(3,3));
         
@@ -36,7 +71,10 @@ public class CompareFrame extends JFrame
         setSize(1443, 570);        // "super" JFrame sets initial size
         setVisible(true);          // "super" JFrame shows
     }
-    public void endEarly() //Add and subtract entire panes, not just buttons and labels
+    /**
+     * Remove bottom buttons and add end early buttons
+     */
+    public void endEarly()
     {
     	botPane.removeAll();
     	
@@ -65,12 +103,18 @@ public class CompareFrame extends JFrame
     		}
     	});
     }
+    /**
+     * Remove end early buttons and add back bottom buttons
+     */
     public void cancelEndEarly()
     {
     	botPane.removeAll();
     	addBotButtons();
     	cp.revalidate();
     }
+    /**
+     * Add bottom buttons
+     */
     public void addBotButtons()
     {
     	JButton matchButton = new JButton("Confirm Movement");
@@ -100,6 +144,18 @@ public class CompareFrame extends JFrame
             }
         });
     }
+    /**
+     * Update CompareFrame with new information
+     * @param f1 image File object
+     * @param f2 image File object
+     * @param i structural similarity index
+     * @param d1 date String object associated with File f1
+     * @param d2 date String object associated with File f2
+     * @param t1 time String object associated with File f1
+     * @param t2 time String object associated with File f2
+     * @param ci current image pair index
+     * @param len maximum image pair index
+     */
     public void updateFrame(File f1,File f2,double i,String d1,String d2,String t1,String t2,int ci,int len)
     {
     	topPane.removeAll();
@@ -124,11 +180,17 @@ public class CompareFrame extends JFrame
         
         cp.revalidate();
     }
+    /**
+     * Kills CompareFrame
+     */
     public void killFrame()
     {
     	setVisible(false);
     	dispose();
     }
+    /**
+     * Runs constructor
+     */
     public static void main() {
         // Run the GUI construction in the Event-Dispatching thread for thread-safety
         SwingUtilities.invokeLater(new Runnable() {
@@ -138,18 +200,33 @@ public class CompareFrame extends JFrame
             }
         });
     }
+    /**
+     * Get isMatch
+     * @return isMatch boolean
+     */
     public boolean getIsMatch()
     {
     	return isMatch;
     }
+    /**
+     * Get buttonPressed
+     * @return buttonPressed boolean
+     */
     public boolean getButtonPressed()
     {
     	return buttonPressed;
     }
+    /**
+     * Get endEarly
+     * @return endEarly boolean
+     */
     public boolean getEndEarly()
     {
     	return endEarly;
     }
+    /**
+     * Set all booleans to false
+     */
     public void resetStates()
     {
     	buttonPressed = false;
