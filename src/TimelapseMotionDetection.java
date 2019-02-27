@@ -53,15 +53,18 @@ public class TimelapseMotionDetection
     public static void thresholdDialog()
     {
     	String newThresh = JOptionPane.showInputDialog("Please input a new match\nthreshold between 0.0 and 1.0");
-		double tmpThresh = Double.parseDouble(newThresh);
-		if(tmpThresh >= 0.0 && tmpThresh <= 1.0)
-		{
-			threshold = tmpThresh;
-		}
-		else
-		{
-			thresholdDialog();
-		}
+    	if(newThresh != null && !newThresh.equals(""))
+    	{
+    		double tmpThresh = Double.parseDouble(newThresh);
+    		if(tmpThresh >= 0.0 && tmpThresh <= 1.0)
+    		{
+    			threshold = tmpThresh;
+    		}
+    		else
+    		{
+    			thresholdDialog();
+    		}
+    	}
     }
     public static void fileOpenWarning()
     {
